@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.30)
-project(sfml_setup)
+project(geometryGame)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 set(BUILD_SHARED_LIBS FALSE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 file(GLOB SOURCES "src/*.cpp")
 
