@@ -1,8 +1,11 @@
+#include <Game.h>
+#include <SFML/Graphics.hpp>
 #include <iostream>
 
 int main()
 {
-    std::cout << "Hello, world" << std::endl;
+    Game g("config.txt");
+    g.run();
 
     return 0;
 }
