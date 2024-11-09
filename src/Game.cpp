@@ -23,22 +23,26 @@ void Game::run()
 {
     while (m_running)
     {
-        m_entities.update();
+        if (m_running)
+        {
+            m_entities.update();
 
-        sEnemySpawner();
-        sMovement();
-        sCollision();
-        sUserInput();
-        sRender();
+            sEnemySpawner();
+            sMovement();
+            sCollision();
+            sUserInput();
+            sRender();
 
-        // incrementing the frame may need to move when pause is implemented
-        m_currentFrame++;
+            // incrementing the frame may need to move when pause is implemented
+            m_currentFrame++;
+        }
     }
 }
 
 void Game::setPaused(bool paused)
 {
-
+    m_paused = true;
+    m_running = false;
 }
 
 void Game::spawnPlayer()
@@ -125,35 +129,26 @@ void Game::sCollision()
 
 void Game::sEnemySpawner()
 {
-    // TODO: code which implements enemy spawning should go here
-    // use (m_currentFrame - m_lastEnemySpawnTime) to determine 
-    // how long it has been since the last enemy spawned
+    if (m_currentFrame - m_lastEnemySpawnTime > 120)
+    {
+        std::cout << "enemy spawned" << std::endl;
+        spawnEnemy();
+    }
 }
 
 void Game::sRender()
 {
-    // TODO: change the code below to draw all entities
     m_window.clear();
 
-    // set the position of the shape based on the entity's transform->pos
-    m_player->cShape->circle.setPosition(m_player->cTransform->pos.x, m_player->cTransform->pos.y);
+    for (auto e : m_entities.getEntities())
+    {
+        e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
 
-    // set the rotation of the shape based on the entity's transform->angle
-    m_player->cTransform->angle += 1.0f;
-    m_player->cShape->circle.setRotation(m_player->cTransform->angle);
+        e->cTransform->angle += 1.0f;
+        e->cShape->circle.setRotation(e->cTransform->angle);
 
-    // draw the entity's sf::CircleShape
-    m_window.draw(m_player->cShape->circle);
-
-    // for (auto e : m_entities.getEntities())
-    // {
-    //     e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
-
-    //     e->cTransform->angle += 1.0f;
-    //     e->cShape->circle.setRotation(e->cTransform->angle);
-
-    //     m_window.draw(e->cShape->circle);
-    // }
+        m_window.draw(e->cShape->circle);
+    }
 
     m_window.display();
 }
