@@ -23,13 +23,14 @@ void Game::run()
 {
     while (m_running)
     {
-        if (m_running)
+        if (!m_paused)
         {
             m_entities.update();
 
             sEnemySpawner();
             sMovement();
             sCollision();
+            sLifespan();
             sUserInput();
             sRender();
 
@@ -81,6 +82,8 @@ void Game::spawnEnemy()
 
     entity->cShape = std::make_shared<CShape>(16.0f, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 2.0f);
 
+    entity->cLifespan = std::make_shared<CLifespan>(240);
+
     // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
 }
@@ -113,12 +116,20 @@ void Game::sMovement()
 
 void Game::sLifespan()
 {
-    // TODO: implement all lifespan functionality
-    // for all entities:
-    //     if entity has no lifespan component, skip it
-    //     if entity has >0 remaining lifespan, subtract 1
-    //     if lifespan >0 and is alive, scale alpha channel properly
-    //     if lifespan =0 destroy the entity
+    for (auto e : m_entities.getEntities())
+    {
+        if (e->cLifespan)
+        {
+            if (e->cLifespan->remaining > 0)
+            {
+                e->cLifespan->remaining--;
+                // implement alpha channel
+            } else
+            {
+                e->destroy();
+            }
+        }
+    }
 }   
 
 void Game::sCollision()
