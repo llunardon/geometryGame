@@ -51,6 +51,5 @@ const EntityVec& EntityManager::getEntities()
 
 const EntityVec& EntityManager::getEntities(const std::string& tag)
 {
-    // TODO: correct this, return the correct vector from the EntityMap
     return m_entityMap[tag];
 }
