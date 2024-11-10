@@ -110,8 +110,26 @@ void Game::sMovement()
     // TODO: implement all entity movement in this function
     // should read the m_player->cInput component to determine if player is moving 
 
-    m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
-    m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+    if (m_player->cInput->up)
+    {
+        m_player->cTransform->velocity = {0.0, 5.0};
+        m_player->cTransform->pos.y -= m_player->cTransform->velocity.y;
+    }
+    if (m_player->cInput->down)
+    {
+        m_player->cTransform->velocity = {0.0, 5.0};
+        m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+    }
+    if (m_player->cInput->left)
+    {
+        m_player->cTransform->velocity = {5.0, 0.0};
+        m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
+    }
+    if (m_player->cInput->right)
+    {
+        m_player->cTransform->velocity = {5.0, 0.0};
+        m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
+    }
 }   
 
 void Game::sLifespan()
@@ -184,8 +202,16 @@ void Game::sUserInput()
             switch (event.key.code)
             {
                 case sf::Keyboard::W:
-                    std::cout << "W key was pressed\n";
-                    // TODO: set player's input component "up" to true
+                    m_player->cInput->up = true;
+                    break;
+                case sf::Keyboard::S:
+                    m_player->cInput->down = true;
+                    break;
+                case sf::Keyboard::A:
+                    m_player->cInput->left = true;
+                    break;
+                case sf::Keyboard::D:
+                    m_player->cInput->right = true;
                     break;
                 default:
                     break;
@@ -197,8 +223,16 @@ void Game::sUserInput()
             switch (event.key.code)
             {
                 case sf::Keyboard::W:
-                    std::cout << "W key was released\n";
-                    // TODO: set player's input component "up" to false
+                    m_player->cInput->up = false;
+                    break;
+                case sf::Keyboard::S:
+                    m_player->cInput->down = false;
+                    break;
+                case sf::Keyboard::A:
+                    m_player->cInput->left = false;
+                    break;
+                case sf::Keyboard::D:
+                    m_player->cInput->right = false;
                     break;
                 default:
                     break;
