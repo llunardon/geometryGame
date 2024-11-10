@@ -73,16 +73,18 @@ void Game::spawnPlayer()
 void Game::spawnEnemy()
 {
     float radius = 16.0f;
+    float collRadius = 128.0f;
+
     auto entity = m_entities.addEntity("enemy");
 
-    float ex = radius + (std::rand() % (m_window.getSize().x - (int) std::ceil(2 * radius)));
-    float ey = radius + (std::rand() % (m_window.getSize().y - (int) std::ceil(2 * radius)));
+    float ex = collRadius + (std::rand() % (m_window.getSize().x - (int) std::ceil(2 * collRadius)));
+    float ey = collRadius + (std::rand() % (m_window.getSize().y - (int) std::ceil(2 * collRadius)));
 
     entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(5.0f, 5.0f), 0.0f);
 
     entity->cShape = std::make_shared<CShape>(radius, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 2.0f);
 
-    entity->cCollision = std::make_shared<CCollision>(20.0f);
+    entity->cCollision = std::make_shared<CCollision>(128.0f);
 
     entity->cLifespan = std::make_shared<CLifespan>(480);
 
