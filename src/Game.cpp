@@ -2,6 +2,9 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <sstream>
+#include <memory>
+#include <string>
 
 Game::Game(const std::string& config)
 {
@@ -10,12 +13,28 @@ Game::Game(const std::string& config)
 
 void Game::init(const std::string& path) 
 {
-    // TODO: read config file here, use PlayerConfig, EnemyConfig, BulletConfig structs
-    // std::ifstream fin(path);
-    // fin >> m_playerConfig.SR >> m_playerConfig.CR >>;
+    std::ifstream config_file(path);
+    if (!config_file)
+    {
+        std::cerr << "Error opening config file " << path << std::endl;
+    }
 
-    m_window.create(sf::VideoMode(1280, 720), "GeometryGame");
-    m_window.setFramerateLimit(60);
+    std::string line;
+    while (std::getline(config_file, line))
+    {
+        std::stringstream ss(line);
+        std::istream_iterator<std::string> begin(ss);
+        std::istream_iterator<std::string> end;
+        std::vector<std::string> tokens(begin, end);
+
+        if (tokens[0] == "WINDOW")
+        {
+            m_window.create(sf::VideoMode(std::stoi(tokens[1]), std::stoi(tokens[2])), "GeometryGame");
+            m_window.setFramerateLimit(std::stoi(tokens[3]));
+        }
+    }
+
+    config_file.close();
 
     spawnPlayer();
 }
@@ -73,7 +92,7 @@ void Game::spawnPlayer()
 void Game::spawnEnemy()
 {
     float radius = 16.0f;
-    float collRadius = 128.0f;
+    float collRadius = 24.0f;
 
     auto entity = m_entities.addEntity("enemy");
 
@@ -84,7 +103,7 @@ void Game::spawnEnemy()
 
     entity->cShape = std::make_shared<CShape>(radius, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 2.0f);
 
-    entity->cCollision = std::make_shared<CCollision>(128.0f);
+    entity->cCollision = std::make_shared<CCollision>(collRadius);
 
     entity->cLifespan = std::make_shared<CLifespan>(480);
 
