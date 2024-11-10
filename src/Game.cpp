@@ -29,7 +29,14 @@ void Game::init(const std::string& path)
 
         if (tokens[0] == "WINDOW")
         {
-            m_window.create(sf::VideoMode(std::stoi(tokens[1]), std::stoi(tokens[2])), "GeometryGame");
+            if (std::stoi(tokens[4]) == 1)
+            {
+                m_window.create(sf::VideoMode(std::stoi(tokens[1]), std::stoi(tokens[2])), "GeometryGame", sf::Style::Fullscreen);
+            } else
+            {
+                m_window.create(sf::VideoMode(std::stoi(tokens[1]), std::stoi(tokens[2])), "GeometryGame", sf::Style::Default);
+            }
+
             m_window.setFramerateLimit(std::stoi(tokens[3]));
         }
     }
