@@ -1,6 +1,7 @@
 #include <Game.h>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 Game::Game(const std::string& config)
 {
@@ -71,16 +72,15 @@ void Game::spawnPlayer()
 
 void Game::spawnEnemy()
 {
-    // TODO: make sure the enemy is spawned properly with the m_enemyConfig variables
-    // the enemy must be spawned completely within the window
+    float radius = 16.0f;
     auto entity = m_entities.addEntity("enemy");
 
-    float ex = rand() % m_window.getSize().x;
-    float ey = rand() % m_window.getSize().y;
+    float ex = radius + (std::rand() % (m_window.getSize().x - (int) std::ceil(2 * radius)));
+    float ey = radius + (std::rand() % (m_window.getSize().y - (int) std::ceil(2 * radius)));
 
     entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0.0f, 0.0f), 0.0f);
 
-    entity->cShape = std::make_shared<CShape>(16.0f, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 2.0f);
+    entity->cShape = std::make_shared<CShape>(radius, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 2.0f);
 
     entity->cLifespan = std::make_shared<CLifespan>(240);
 
