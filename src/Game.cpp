@@ -78,11 +78,13 @@ void Game::spawnEnemy()
     float ex = radius + (std::rand() % (m_window.getSize().x - (int) std::ceil(2 * radius)));
     float ey = radius + (std::rand() % (m_window.getSize().y - (int) std::ceil(2 * radius)));
 
-    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0.0f, 0.0f), 0.0f);
+    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(5.0f, 5.0f), 0.0f);
 
     entity->cShape = std::make_shared<CShape>(radius, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 2.0f);
 
-    entity->cLifespan = std::make_shared<CLifespan>(240);
+    entity->cCollision = std::make_shared<CCollision>(20.0f);
+
+    entity->cLifespan = std::make_shared<CLifespan>(480);
 
     // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
@@ -102,11 +104,16 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 {
-
 }
 
 void Game::sMovement()
 {
+    for (auto e : m_entities.getEntities("enemy"))
+    {
+        e->cTransform->pos.x += e->cTransform->velocity.x;
+        e->cTransform->pos.y += e->cTransform->velocity.y;
+    }
+
     // TODO: implement all entity movement in this function
     // should read the m_player->cInput component to determine if player is moving 
 
@@ -154,6 +161,18 @@ void Game::sCollision()
 {
     // TODO: implement all collision between entities
     // be sure to use collision radius, not shape radius
+    for (auto e : m_entities.getEntities("enemy"))
+    {
+        // std::cout << e->cTransform->pos.x << ",  " << e->cTransform->pos.y << std::endl;
+        if (e->cTransform->pos.x <= e->cCollision->radius || e->cTransform->pos.x >= m_window.getSize().x - e->cCollision->radius)
+        {
+            e->cTransform->velocity.x *= -1;
+        }
+        if (e->cTransform->pos.y <= e->cCollision->radius || e->cTransform->pos.y >= m_window.getSize().y - e->cCollision->radius)
+        {
+            e->cTransform->velocity.y *= -1;
+        }
+    }
 }
 
 void Game::sEnemySpawner()
