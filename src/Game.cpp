@@ -38,6 +38,19 @@ void Game::init(const std::string& path)
             }
 
             m_window.setFramerateLimit(std::stoi(tokens[3]));
+        } else if (tokens[0] == "PLAYER")
+        {
+            m_playerConfig.SR = std::stoi(tokens[1]);
+            m_playerConfig.CR = std::stoi(tokens[2]);
+            m_playerConfig.S = std::stof(tokens[3]);
+            m_playerConfig.FR = std::stoi(tokens[4]);
+            m_playerConfig.FG = std::stoi(tokens[5]);
+            m_playerConfig.FB = std::stoi(tokens[6]);
+            m_playerConfig.OR = std::stoi(tokens[7]);
+            m_playerConfig.OG = std::stoi(tokens[8]);
+            m_playerConfig.OB = std::stoi(tokens[9]);
+            m_playerConfig.OT = std::stoi(tokens[10]);
+            m_playerConfig.V = std::stoi(tokens[11]);
         }
     }
 
@@ -86,7 +99,11 @@ void Game::spawnPlayer()
     entity->cTransform = std::make_shared<CTransform>(Vec2(mx, my), Vec2(0.0f, 0.0f), 0.0f);
 
     // shape: radius 32, 8 sides, dark grey fill, red outline of thickness 4
-    entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
+    entity->cShape = std::make_shared<CShape>(m_playerConfig.SR,
+                                              m_playerConfig.V,
+                                              sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB),
+                                              sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB),
+                                              m_playerConfig.OT);
 
     // add input component to the player so that we can use inputs
     entity->cInput = std::make_shared<CInput>();

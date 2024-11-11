@@ -6,17 +6,17 @@
 
 /*
     config file:
-        - Window W H FL FS
+        - WINDOW W H FL FS
             - W, H: window width and height (int)
             - FL: frame limit (int)
             - FS: full screen or not (bool)
 
-        - Font F S R G B
+        - FONT F S R G B
             - F: font file name, no whitespace (std::string)
             - S: font size (int)
             - R, G, B (int, int, int)
 
-        - Player SR CR S FR FG FB OR OG OB OT V
+        - PLAYER SR CR S FR FG FB OR OG OB OT V
             - SR: shape radius (int)
             - CR: collision radius (int)
             - S: speed, magnitude (float)
@@ -25,7 +25,7 @@
             - OT: outline thickness (int)
             - V: number of vertices of the shape (int)
 
-        - Enemy SR CR SMIN SMAX OR OG OB OT VMIN VMAX L SI
+        - ENEMY SR CR SMIN SMAX OR OG OB OT VMIN VMAX L SI
             - SR: shape radius (int)
             - CR: collision radius (int)
             - SMIN, SMAX: speed min and max (float, float)
@@ -33,7 +33,7 @@
             - VMIN, VMAX: min and max vertices (int, int)
             - L: small shape lifespan (int)
 
-         - Bullet: SR CR S FR FG FB OR OG OB OT V L
+         - BULLET: SR CR S FR FG FB OR OG OB OT V L
             - SR: shape radius (int)
             - CR: collision radius (int)
             - S: speed, magnitude (float)
