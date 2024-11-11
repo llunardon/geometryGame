@@ -28,7 +28,8 @@ void EntityManager::removeDeadEntities(EntityVec& vec)
         if (!vec[i]->isActive())
         {
             vec.erase(vec.begin() + i);
-        } else
+        } 
+        else
         {
             i++;
         }

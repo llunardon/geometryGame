@@ -32,13 +32,15 @@ void Game::init(const std::string& path)
             if (std::stoi(tokens[4]) == 1)
             {
                 m_window.create(sf::VideoMode(std::stoi(tokens[1]), std::stoi(tokens[2])), "GeometryGame", sf::Style::Fullscreen);
-            } else
+            }
+            else
             {
                 m_window.create(sf::VideoMode(std::stoi(tokens[1]), std::stoi(tokens[2])), "GeometryGame", sf::Style::Default);
             }
 
             m_window.setFramerateLimit(std::stoi(tokens[3]));
-        } else if (tokens[0] == "PLAYER")
+        } 
+        else if (tokens[0] == "PLAYER")
         {
             m_playerConfig.SR = std::stoi(tokens[1]);
             m_playerConfig.CR = std::stoi(tokens[2]);
@@ -51,7 +53,8 @@ void Game::init(const std::string& path)
             m_playerConfig.OB = std::stoi(tokens[9]);
             m_playerConfig.OT = std::stoi(tokens[10]);
             m_playerConfig.V = std::stoi(tokens[11]);
-        } else if (tokens[0] == "ENEMY")
+        }
+        else if (tokens[0] == "ENEMY")
         {
             m_enemyConfig.SR = std::stoi(tokens[1]);
             m_enemyConfig.CR = std::stoi(tokens[2]);
@@ -209,7 +212,8 @@ void Game::sLifespan()
             {
                 e->cLifespan->remaining--;
                 // implement alpha channel
-            } else
+            } 
+            else
             {
                 e->destroy();
             }
