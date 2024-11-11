@@ -32,6 +32,7 @@
             - OR, OG, OB: outline color (int, int, int)
             - VMIN, VMAX: min and max vertices (int, int)
             - L: small shape lifespan (int)
+            - SI: spawn interval (int)
 
          - BULLET: SR CR S FR FG FB OR OG OB OT V L
             - SR: shape radius (int)
@@ -44,19 +45,19 @@
             - L: lifespan (int)
 */
 
-struct PlayerConfig 
+struct PlayerConfig
 {
     int SR, CR, FR, FG, FB, OR, OG, OB, OT, V;
     float S;
 };
 
-struct EnemyConfig 
+struct EnemyConfig
 {
     int SR, CR, OR, OG, OB, OT, VMIN, VMAX, L, SI;
     float SMIN, SMAX;
 };
 
-struct BulletConfig 
+struct BulletConfig
 {
     int SR, CR, FR, FG, FB, OR, OG, OB, OT, V, L;
     float S;
@@ -79,7 +80,7 @@ class Game
 
     std::shared_ptr<Entity> m_player;
 
-    void init(const std::string& config);
+    void init(const std::string &config);
     void setPaused(bool paused);
 
     void sMovement();
@@ -93,9 +94,10 @@ class Game
     void spawnEnemy();
     void spawnSmallEnemies(std::shared_ptr<Entity> entity);
     void spawnSpecialWeapon(std::shared_ptr<Entity> entity);
-    void spawnBullet(std::shared_ptr<Entity> entity, const Vec2& mousePos);
+    void spawnBullet(std::shared_ptr<Entity> entity, const Vec2 &mousePos);
+
 public:
-    Game(const std::string& config);
+    Game(const std::string &config);
 
     void run();
 };

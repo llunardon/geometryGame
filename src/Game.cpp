@@ -51,6 +51,20 @@ void Game::init(const std::string& path)
             m_playerConfig.OB = std::stoi(tokens[9]);
             m_playerConfig.OT = std::stoi(tokens[10]);
             m_playerConfig.V = std::stoi(tokens[11]);
+        } else if (tokens[0] == "ENEMY")
+        {
+            m_enemyConfig.SR = std::stoi(tokens[1]);
+            m_enemyConfig.CR = std::stoi(tokens[2]);
+            m_enemyConfig.SMIN = std::stof(tokens[3]);
+            m_enemyConfig.SMAX = std::stof(tokens[4]);
+            m_enemyConfig.OR = std::stoi(tokens[5]);
+            m_enemyConfig.OG = std::stoi(tokens[6]);
+            m_enemyConfig.OB = std::stoi(tokens[7]);
+            m_enemyConfig.OT = std::stoi(tokens[8]);
+            m_enemyConfig.VMIN = std::stoi(tokens[9]);
+            m_enemyConfig.VMAX = std::stoi(tokens[10]);
+            m_enemyConfig.L = std::stoi(tokens[11]);
+            m_enemyConfig.SI = std::stoi(tokens[12]);
         }
     }
 
@@ -88,48 +102,49 @@ void Game::setPaused(bool paused)
 
 void Game::spawnPlayer()
 {
-    // TODO: finish adding all properties of the player with config values
-
-    // create every entity by calling EntityManager.addEntity(tag)
     auto entity = m_entities.addEntity("player");
 
-    // give this entity a transform so it spawns at the center of the window with v(0, 0) and angle 0
     float mx = m_window.getSize().x / 2.0f;
     float my = m_window.getSize().y / 2.0f;
     entity->cTransform = std::make_shared<CTransform>(Vec2(mx, my), Vec2(0.0f, 0.0f), 0.0f);
 
-    // shape: radius 32, 8 sides, dark grey fill, red outline of thickness 4
     entity->cShape = std::make_shared<CShape>(m_playerConfig.SR,
                                               m_playerConfig.V,
                                               sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB),
                                               sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB),
                                               m_playerConfig.OT);
 
-    // add input component to the player so that we can use inputs
     entity->cInput = std::make_shared<CInput>();
 
-    // since we want this entity to be our player, set our Game's m_player variable to be this entity
-    // this goes against the EntityManager paradigm, but we use the player so much that it's worth it
     m_player = entity;
 }
 
 void Game::spawnEnemy()
 {
-    float radius = 16.0f;
-    float collRadius = 24.0f;
+    float radius = m_enemyConfig.SR;
+    float collRadius = m_enemyConfig.CR;
 
     auto entity = m_entities.addEntity("enemy");
 
     float ex = collRadius + (std::rand() % (m_window.getSize().x - (int) std::ceil(2 * collRadius)));
     float ey = collRadius + (std::rand() % (m_window.getSize().y - (int) std::ceil(2 * collRadius)));
 
-    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(5.0f, 5.0f), 0.0f);
+    float sx = m_enemyConfig.SMIN + (std::rand() % (int) (m_enemyConfig.SMAX - m_enemyConfig.SMIN + 1)) * (((std::rand() % 2) * 2) - 1);
+    float sy = m_enemyConfig.SMIN + (std::rand() % (int) (m_enemyConfig.SMAX - m_enemyConfig.SMIN + 1)) * (((std::rand() % 2) * 2) - 1);
 
-    entity->cShape = std::make_shared<CShape>(radius, 3, sf::Color(0, 0, 255), sf::Color(255, 255, 255), 2.0f);
+    int sides = m_enemyConfig.VMIN + (std::rand() % (m_enemyConfig.VMAX - m_enemyConfig.VMIN + 1));
+
+    int r = (std::rand() % 255);
+    int g = (std::rand() % 255);
+    int b = (std::rand() % 255);
+
+    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(sx, sy), 0.0f);
+
+    entity->cShape = std::make_shared<CShape>(radius, sides, sf::Color(r, g, b), sf::Color(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB), m_enemyConfig.OT);
 
     entity->cCollision = std::make_shared<CCollision>(collRadius);
 
-    entity->cLifespan = std::make_shared<CLifespan>(480);
+    entity->cLifespan = std::make_shared<CLifespan>(m_enemyConfig.L);
 
     // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
@@ -164,22 +179,22 @@ void Game::sMovement()
 
     if (m_player->cInput->up)
     {
-        m_player->cTransform->velocity = {0.0, 5.0};
+        m_player->cTransform->velocity = {0.0, m_playerConfig.S};
         m_player->cTransform->pos.y -= m_player->cTransform->velocity.y;
     }
     if (m_player->cInput->down)
     {
-        m_player->cTransform->velocity = {0.0, 5.0};
+        m_player->cTransform->velocity = {0.0, m_playerConfig.S};
         m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
     }
     if (m_player->cInput->left)
     {
-        m_player->cTransform->velocity = {5.0, 0.0};
+        m_player->cTransform->velocity = {m_playerConfig.S, 0.0};
         m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
     }
     if (m_player->cInput->right)
     {
-        m_player->cTransform->velocity = {5.0, 0.0};
+        m_player->cTransform->velocity = {m_playerConfig.S, 0.0};
         m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
     }
 }   
@@ -222,7 +237,7 @@ void Game::sCollision()
 
 void Game::sEnemySpawner()
 {
-    if (m_currentFrame - m_lastEnemySpawnTime > 120)
+    if (m_currentFrame - m_lastEnemySpawnTime > m_enemyConfig.SI)
     {
         std::cout << "enemy spawned" << std::endl;
         spawnEnemy();
