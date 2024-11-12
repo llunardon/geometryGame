@@ -188,14 +188,18 @@ void Game::sMovement()
         {
             m_player->cTransform->velocity = {0.0, m_playerConfig.S};
 
-            m_player->cInput->up ? m_player->cTransform->pos.y -= m_player->cTransform->velocity.y : m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+            m_player->cInput->up ? m_player->cTransform->pos.y -= m_player->cTransform->velocity.y 
+                                 : m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
         }
         else
         {
             m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
 
-            m_player->cInput->right ? m_player->cTransform->pos.x += m_player->cTransform->velocity.x : m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
-            m_player->cInput->up ? m_player->cTransform->pos.y -= m_player->cTransform->velocity.y : m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+            m_player->cInput->right ? m_player->cTransform->pos.x += m_player->cTransform->velocity.x 
+                                    : m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
+
+            m_player->cInput->up ? m_player->cTransform->pos.y -= m_player->cTransform->velocity.y 
+                                 : m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
 
         }
     }
@@ -203,7 +207,8 @@ void Game::sMovement()
     {
         m_player->cTransform->velocity = {m_playerConfig.S, 0.0f};
 
-        m_player->cInput->right ? m_player->cTransform->pos.x += m_player->cTransform->velocity.x : m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
+        m_player->cInput->right ? m_player->cTransform->pos.x += m_player->cTransform->velocity.x 
+                                : m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
     }
 }
 
