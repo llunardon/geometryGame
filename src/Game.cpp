@@ -73,6 +73,21 @@ void Game::init(const std::string &path)
             m_enemyConfig.L = std::stoi(tokens[11]);
             m_enemyConfig.SI = std::stoi(tokens[12]);
         }
+        else if (tokens[0] == "BULLET")
+        {
+            m_bulletConfig.SR = std::stoi(tokens[1]);
+            m_bulletConfig.CR = std::stoi(tokens[2]);
+            m_bulletConfig.S = std::stof(tokens[3]);
+            m_bulletConfig.FR = std::stoi(tokens[4]);
+            m_bulletConfig.FG = std::stoi(tokens[5]);
+            m_bulletConfig.FB = std::stoi(tokens[6]);
+            m_bulletConfig.OR = std::stoi(tokens[7]);
+            m_bulletConfig.OG = std::stoi(tokens[8]);
+            m_bulletConfig.OB = std::stoi(tokens[9]);
+            m_bulletConfig.OT = std::stoi(tokens[10]);
+            m_bulletConfig.V= std::stoi(tokens[11]);
+            m_bulletConfig.L = std::stoi(tokens[12]);
+        }
     }
 
     config_file.close();
@@ -166,9 +181,33 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 
 void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 &target)
 {
-    // TODO: implement spawning of bullet which travels toward target
-    // bullet speed is given as scalar speed
-    // must set velocity by using formula in the slides
+    float radius = m_bulletConfig.SR;
+    float collRadius = m_bulletConfig.CR;
+
+    auto bulletEntity = m_entities.addEntity("bullet");
+
+    float originX = entity->cTransform->pos.x;
+    float originY = entity->cTransform->pos.y;
+
+    float speed = m_bulletConfig.S;
+    float angle = std::atan2((target.y - originY), (target.x - originX ));
+
+    float sx = std::cos(angle) * speed;
+    float sy = std::sin(angle) * speed;
+
+    int sides = m_bulletConfig.V;
+
+    int r = m_bulletConfig.FR;
+    int g = m_bulletConfig.FG;
+    int b = m_bulletConfig.FB;
+
+    bulletEntity->cTransform = std::make_shared<CTransform>(Vec2(originX, originY), Vec2(sx, sy), 0.0f);
+
+    bulletEntity->cShape = std::make_shared<CShape>(radius, sides, sf::Color(r, g, b), sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB), m_bulletConfig.OT);
+
+    bulletEntity->cCollision = std::make_shared<CCollision>(collRadius);
+
+    bulletEntity->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
@@ -178,6 +217,12 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 void Game::sMovement()
 {
     for (auto e : m_entities.getEntities("enemy"))
+    {
+        e->cTransform->pos.x += e->cTransform->velocity.x;
+        e->cTransform->pos.y += e->cTransform->velocity.y;
+    }
+
+    for (auto e : m_entities.getEntities("bullet"))
     {
         e->cTransform->pos.x += e->cTransform->velocity.x;
         e->cTransform->pos.y += e->cTransform->velocity.y;
@@ -234,22 +279,25 @@ void Game::sLifespan()
 
 void Game::sCollision()
 {
-    // TODO: implement all collision between entities
-    // be sure to use collision radius, not shape radius
     for (auto e : m_entities.getEntities("enemy"))
     {
-        /*
-            enemy-player collision
-        */
+        /* enemy-bullet collision */
+        for (auto bullet : m_entities.getEntities("bullet"))
+        {
+            if (std::sqrt(std::pow(e->cTransform->pos.x - bullet->cTransform->pos.x, 2) + std::pow(e->cTransform->pos.y - bullet->cTransform->pos.y, 2)) < std::abs(e->cCollision->radius + bullet->cCollision->radius))
+            {
+                e->destroy();
+            }
+        }
+
+        /* enemy-player collision */
         if (std::sqrt(std::pow(e->cTransform->pos.x - m_player->cTransform->pos.x, 2) + std::pow(e->cTransform->pos.y - m_player->cTransform->pos.y, 2)) < std::abs(e->cCollision->radius + m_player->cCollision->radius))
         {
             m_player->cTransform->pos.x = m_window.getSize().x / 2.0f;
             m_player->cTransform->pos.y = m_window.getSize().y / 2.0f;
         }
 
-        /*
-            enemy-wall collision
-        */
+        /* enemy-wall collision */
         if (e->cTransform->pos.x <= e->cCollision->radius || e->cTransform->pos.x >= m_window.getSize().x - e->cCollision->radius)
         {
             e->cTransform->velocity.x *= -1;
@@ -348,7 +396,7 @@ void Game::sUserInput()
             if (event.mouseButton.button == sf::Mouse::Left)
             {
                 std::cout << "Left mouse button clicked at " << event.mouseButton.x << ", " << event.mouseButton.y << "\n";
-                // TODO: call spawnBullet here
+                spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
             }
 
             if (event.mouseButton.button == sf::Mouse::Right)
