@@ -214,6 +214,28 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 {
 }
 
+bool Game::canMove(char dir)
+{
+    switch (dir) 
+    {
+    case 'u':
+        return m_player->cTransform->pos.y - m_player->cShape->circle.getRadius() > 0;
+        break;
+    case 'd':
+        return m_player->cTransform->pos.y + m_player->cShape->circle.getRadius() < m_window.getSize().y;
+        break;
+    case 'r':
+        return m_player->cTransform->pos.x + m_player->cShape->circle.getRadius() < m_window.getSize().x;
+        break;
+    case 'l':
+        return m_player->cTransform->pos.x - m_player->cShape->circle.getRadius() > 0;
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
 void Game::sMovement()
 {
     for (auto e : m_entities.getEntities("enemy"))
@@ -237,11 +259,11 @@ void Game::sMovement()
         {
             m_player->cTransform->velocity = {0.0, m_playerConfig.S};
 
-            if (m_player->cInput->up && (m_player->cTransform->pos.y - m_player->cShape->circle.getRadius() > 0))
+            if (m_player->cInput->up && (canMove('u')))
             {
                 m_player->cTransform->pos.y -= m_player->cTransform->velocity.y; 
             }
-            else if (m_player->cInput->down && (m_player->cTransform->pos.y + m_player->cShape->circle.getRadius() < m_window.getSize().y))
+            else if (m_player->cInput->down && (canMove('d')))
             {
                 m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
             }
@@ -253,20 +275,20 @@ void Game::sMovement()
         {
             m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
 
-            if (m_player->cInput->right && (m_player->cTransform->pos.x + m_player->cShape->circle.getRadius() < m_window.getSize().x))
+            if (m_player->cInput->right && (canMove('r')))
             {
                 m_player->cTransform->pos.x += m_player->cTransform->velocity.x; 
             }
-            else if (m_player->cInput->left && (m_player->cTransform->pos.x - m_player->cShape->circle.getRadius() > 0))
+            else if (m_player->cInput->left && (canMove('l')))
             {
                 m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
             }
 
-            if (m_player->cInput->up && (m_player->cTransform->pos.y - m_player->cShape->circle.getRadius() > 0))
+            if (m_player->cInput->up && (canMove('u')))
             {
                 m_player->cTransform->pos.y -= m_player->cTransform->velocity.y; 
             }
-            else if (m_player->cInput->down && (m_player->cTransform->pos.y + m_player->cShape->circle.getRadius() < m_window.getSize().y))
+            else if (m_player->cInput->down && (canMove('d')))
             {
                 m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
             }
@@ -280,11 +302,11 @@ void Game::sMovement()
     {
         m_player->cTransform->velocity = {m_playerConfig.S, 0.0f};
 
-        if (m_player->cInput->right && (m_player->cTransform->pos.x + m_player->cShape->circle.getRadius() < m_window.getSize().x))
+        if (m_player->cInput->right && (canMove('r')))
         {
             m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
         }
-        else if (m_player->cInput->left && (m_player->cTransform->pos.x - m_player->cShape->circle.getRadius() > 0))
+        else if (m_player->cInput->left && (canMove('l')))
         {
             m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
         }
