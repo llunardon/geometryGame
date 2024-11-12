@@ -1,17 +1,21 @@
 #include <Game.h>
 #include <iostream>
 #include <fstream>
+
+#define _USE_MATH_DEFINES
 #include <cmath>
+
 #include <sstream>
 #include <memory>
 #include <string>
 
-Game::Game(const std::string& config)
+
+Game::Game(const std::string &config)
 {
     init(config);
 }
 
-void Game::init(const std::string& path) 
+void Game::init(const std::string &path)
 {
     std::ifstream config_file(path);
     if (!config_file)
@@ -39,7 +43,7 @@ void Game::init(const std::string& path)
             }
 
             m_window.setFramerateLimit(std::stoi(tokens[3]));
-        } 
+        }
         else if (tokens[0] == "PLAYER")
         {
             m_playerConfig.SR = std::stoi(tokens[1]);
@@ -129,11 +133,16 @@ void Game::spawnEnemy()
 
     auto entity = m_entities.addEntity("enemy");
 
-    float ex = collRadius + (std::rand() % (m_window.getSize().x - (int) std::ceil(2 * collRadius)));
-    float ey = collRadius + (std::rand() % (m_window.getSize().y - (int) std::ceil(2 * collRadius)));
+    float ex = collRadius + (std::rand() % (m_window.getSize().x - (int)std::ceil(2 * collRadius)));
+    float ey = collRadius + (std::rand() % (m_window.getSize().y - (int)std::ceil(2 * collRadius)));
 
-    float sx = m_enemyConfig.SMIN + (std::rand() % (int) (m_enemyConfig.SMAX - m_enemyConfig.SMIN + 1)) * (((std::rand() % 2) * 2) - 1);
-    float sy = m_enemyConfig.SMIN + (std::rand() % (int) (m_enemyConfig.SMAX - m_enemyConfig.SMIN + 1)) * (((std::rand() % 2) * 2) - 1);
+    float speed = m_enemyConfig.SMIN + (std::rand() % (int)(m_enemyConfig.SMAX - m_enemyConfig.SMIN + 1));
+    float angle = std::rand() % 360;
+
+    float sx = std::cos(angle) * speed;
+    float sy = std::sin(angle) * speed;
+
+    // std::cout << speed << ", " << angle << ", " << sx << ", " << sy << std::endl;
 
     int sides = m_enemyConfig.VMIN + (std::rand() % (m_enemyConfig.VMAX - m_enemyConfig.VMIN + 1));
 
@@ -149,16 +158,14 @@ void Game::spawnEnemy()
 
     entity->cLifespan = std::make_shared<CLifespan>(m_enemyConfig.L);
 
-    // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
 }
 
 void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 {
-
 }
 
-void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& target)
+void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 &target)
 {
     // TODO: implement spawning of bullet which travels toward target
     // bullet speed is given as scalar speed
@@ -177,30 +184,59 @@ void Game::sMovement()
         e->cTransform->pos.y += e->cTransform->velocity.y;
     }
 
-    // TODO: implement all entity movement in this function
-    // should read the m_player->cInput component to determine if player is moving 
-
-    if (m_player->cInput->up)
+    if (m_player->cInput->up && !m_player->cInput->right && !m_player->cInput->left)
     {
         m_player->cTransform->velocity = {0.0, m_playerConfig.S};
+
         m_player->cTransform->pos.y -= m_player->cTransform->velocity.y;
     }
-    if (m_player->cInput->down)
+    else if (m_player->cInput->up && m_player->cInput->right && !m_player->cInput->left)
+    {
+        m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
+
+        m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
+        m_player->cTransform->pos.y -= m_player->cTransform->velocity.y;
+    }
+    else if (m_player->cInput->up && !m_player->cInput->right && m_player->cInput->left)
+    {
+        m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
+
+        m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
+        m_player->cTransform->pos.y -= m_player->cTransform->velocity.y;
+    }
+    else if (m_player->cInput->down && !m_player->cInput->right && !m_player->cInput->left)
     {
         m_player->cTransform->velocity = {0.0, m_playerConfig.S};
+
         m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
     }
-    if (m_player->cInput->left)
+    else if (m_player->cInput->down && m_player->cInput->right && !m_player->cInput->left)
     {
-        m_player->cTransform->velocity = {m_playerConfig.S, 0.0};
-        m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
+        m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
+
+        m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
+        m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
     }
-    if (m_player->cInput->right)
+    else if (m_player->cInput->down && !m_player->cInput->right && m_player->cInput->left)
     {
-        m_player->cTransform->velocity = {m_playerConfig.S, 0.0};
+        m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
+
+        m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
+        m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+    }
+    else if (!m_player->cInput->up && m_player->cInput->right && !m_player->cInput->left)
+    {
+        m_player->cTransform->velocity = {m_playerConfig.S, 0.0f};
+
         m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
     }
-}   
+    else if (!m_player->cInput->up && !m_player->cInput->right && m_player->cInput->left)
+    {
+        m_player->cTransform->velocity = {m_playerConfig.S, 0.0f};
+
+        m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
+    }
+}
 
 void Game::sLifespan()
 {
@@ -212,14 +248,14 @@ void Game::sLifespan()
             {
                 e->cLifespan->remaining--;
                 // implement alpha channel
-            } 
+            }
             else
             {
                 e->destroy();
             }
         }
     }
-}   
+}
 
 void Game::sCollision()
 {
@@ -243,7 +279,6 @@ void Game::sEnemySpawner()
 {
     if (m_currentFrame - m_lastEnemySpawnTime > m_enemyConfig.SI)
     {
-        std::cout << "enemy spawned" << std::endl;
         spawnEnemy();
     }
 }
@@ -284,20 +319,20 @@ void Game::sUserInput()
         {
             switch (event.key.code)
             {
-                case sf::Keyboard::W:
-                    m_player->cInput->up = true;
-                    break;
-                case sf::Keyboard::S:
-                    m_player->cInput->down = true;
-                    break;
-                case sf::Keyboard::A:
-                    m_player->cInput->left = true;
-                    break;
-                case sf::Keyboard::D:
-                    m_player->cInput->right = true;
-                    break;
-                default:
-                    break;
+            case sf::Keyboard::W:
+                m_player->cInput->up = true;
+                break;
+            case sf::Keyboard::S:
+                m_player->cInput->down = true;
+                break;
+            case sf::Keyboard::A:
+                m_player->cInput->left = true;
+                break;
+            case sf::Keyboard::D:
+                m_player->cInput->right = true;
+                break;
+            default:
+                break;
             }
         }
 
@@ -305,20 +340,20 @@ void Game::sUserInput()
         {
             switch (event.key.code)
             {
-                case sf::Keyboard::W:
-                    m_player->cInput->up = false;
-                    break;
-                case sf::Keyboard::S:
-                    m_player->cInput->down = false;
-                    break;
-                case sf::Keyboard::A:
-                    m_player->cInput->left = false;
-                    break;
-                case sf::Keyboard::D:
-                    m_player->cInput->right = false;
-                    break;
-                default:
-                    break;
+            case sf::Keyboard::W:
+                m_player->cInput->up = false;
+                break;
+            case sf::Keyboard::S:
+                m_player->cInput->down = false;
+                break;
+            case sf::Keyboard::A:
+                m_player->cInput->left = false;
+                break;
+            case sf::Keyboard::D:
+                m_player->cInput->right = false;
+                break;
+            default:
+                break;
             }
         }
 
