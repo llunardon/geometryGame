@@ -85,7 +85,7 @@ void Game::init(const std::string &path)
             m_bulletConfig.OG = std::stoi(tokens[8]);
             m_bulletConfig.OB = std::stoi(tokens[9]);
             m_bulletConfig.OT = std::stoi(tokens[10]);
-            m_bulletConfig.V= std::stoi(tokens[11]);
+            m_bulletConfig.V = std::stoi(tokens[11]);
             m_bulletConfig.L = std::stoi(tokens[12]);
         }
     }
@@ -107,18 +107,19 @@ void Game::run()
             sMovement();
             sCollision();
             sLifespan();
-            sUserInput();
-            sRender();
-
-            // incrementing the frame may need to move when pause is implemented
             m_currentFrame++;
         }
+
+        sUserInput();
+        sRender();
+
+        std::cout << "game is running" << std::endl;
     }
 }
 
 void Game::setPaused(bool paused)
 {
-    m_paused = true;
+    paused ? m_paused = false : m_paused = true;
 }
 
 void Game::spawnPlayer()
@@ -336,11 +337,6 @@ void Game::sRender()
 
 void Game::sUserInput()
 {
-    // TODO: handle user input here
-    // note: should only be setting the player's input components variables here
-    // you should not implement the player's movement here
-    // the movement system will read the variables you set in this function
-
     sf::Event event;
     while (m_window.pollEvent(event))
     {
@@ -353,20 +349,27 @@ void Game::sUserInput()
         {
             switch (event.key.code)
             {
-            case sf::Keyboard::W:
-                m_player->cInput->up = true;
+            case sf::Keyboard::P:
+                setPaused(m_paused);
                 break;
-            case sf::Keyboard::S:
-                m_player->cInput->down = true;
-                break;
-            case sf::Keyboard::A:
-                m_player->cInput->left = true;
-                break;
-            case sf::Keyboard::D:
-                m_player->cInput->right = true;
-                break;
-            default:
-                break;
+            
+            if (!m_paused)
+            {
+                case sf::Keyboard::W:
+                    m_player->cInput->up = true;
+                    break;
+                case sf::Keyboard::S:
+                    m_player->cInput->down = true;
+                    break;
+                case sf::Keyboard::A:
+                    m_player->cInput->left = true;
+                    break;
+                case sf::Keyboard::D:
+                    m_player->cInput->right = true;
+                    break;
+                default:
+                    break;
+                }
             }
         }
 
@@ -393,16 +396,17 @@ void Game::sUserInput()
 
         if (event.type == sf::Event::MouseButtonPressed)
         {
-            if (event.mouseButton.button == sf::Mouse::Left)
+            if (!m_paused)
             {
-                std::cout << "Left mouse button clicked at " << event.mouseButton.x << ", " << event.mouseButton.y << "\n";
-                spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
-            }
+                if (event.mouseButton.button == sf::Mouse::Left)
+                {
+                    spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
+                }
 
-            if (event.mouseButton.button == sf::Mouse::Right)
-            {
-                std::cout << "Right mouse button clicked at " << event.mouseButton.x << ", " << event.mouseButton.y << "\n";
-                // TODO: call spawnSpecialWeapon here
+                if (event.mouseButton.button == sf::Mouse::Right)
+                {
+                    // TODO: call spawnSpecialWeapon here
+                }
             }
         }
     }
