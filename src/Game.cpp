@@ -104,7 +104,6 @@ void Game::run()
 void Game::setPaused(bool paused)
 {
     m_paused = true;
-    m_running = false;
 }
 
 void Game::spawnPlayer()
@@ -122,6 +121,8 @@ void Game::spawnPlayer()
                                               m_playerConfig.OT);
 
     entity->cInput = std::make_shared<CInput>();
+
+    entity->cCollision = std::make_shared<CCollision>(m_playerConfig.CR);
 
     m_player = entity;
 }
@@ -237,7 +238,18 @@ void Game::sCollision()
     // be sure to use collision radius, not shape radius
     for (auto e : m_entities.getEntities("enemy"))
     {
-        // std::cout << e->cTransform->pos.x << ",  " << e->cTransform->pos.y << std::endl;
+        /*
+            enemy-player collision
+        */
+        if (std::sqrt(std::pow(e->cTransform->pos.x - m_player->cTransform->pos.x, 2) + std::pow(e->cTransform->pos.y - m_player->cTransform->pos.y, 2)) < std::abs(e->cCollision->radius + m_player->cCollision->radius))
+        {
+            m_player->cTransform->pos.x = m_window.getSize().x / 2.0f;
+            m_player->cTransform->pos.y = m_window.getSize().y / 2.0f;
+        }
+
+        /*
+            enemy-wall collision
+        */
         if (e->cTransform->pos.x <= e->cCollision->radius || e->cTransform->pos.x >= m_window.getSize().x - e->cCollision->radius)
         {
             e->cTransform->velocity.x *= -1;
