@@ -142,8 +142,6 @@ void Game::spawnEnemy()
     float sx = std::cos(angle) * speed;
     float sy = std::sin(angle) * speed;
 
-    // std::cout << speed << ", " << angle << ", " << sx << ", " << sy << std::endl;
-
     int sides = m_enemyConfig.VMIN + (std::rand() % (m_enemyConfig.VMAX - m_enemyConfig.VMIN + 1));
 
     int r = (std::rand() % 255);
@@ -184,57 +182,28 @@ void Game::sMovement()
         e->cTransform->pos.y += e->cTransform->velocity.y;
     }
 
-    if (m_player->cInput->up && !m_player->cInput->right && !m_player->cInput->left)
+    if ((m_player->cInput->up || m_player->cInput->down) && !(m_player->cInput->up && m_player->cInput->down))
     {
-        m_player->cTransform->velocity = {0.0, m_playerConfig.S};
+        if ((!m_player->cInput->right && !m_player->cInput->left) || (m_player->cInput->right && m_player->cInput->left))
+        {
+            m_player->cTransform->velocity = {0.0, m_playerConfig.S};
 
-        m_player->cTransform->pos.y -= m_player->cTransform->velocity.y;
-    }
-    else if (m_player->cInput->up && m_player->cInput->right && !m_player->cInput->left)
-    {
-        m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
+            m_player->cInput->up ? m_player->cTransform->pos.y -= m_player->cTransform->velocity.y : m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+        }
+        else
+        {
+            m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
 
-        m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
-        m_player->cTransform->pos.y -= m_player->cTransform->velocity.y;
-    }
-    else if (m_player->cInput->up && !m_player->cInput->right && m_player->cInput->left)
-    {
-        m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
+            m_player->cInput->right ? m_player->cTransform->pos.x += m_player->cTransform->velocity.x : m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
+            m_player->cInput->up ? m_player->cTransform->pos.y -= m_player->cTransform->velocity.y : m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
 
-        m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
-        m_player->cTransform->pos.y -= m_player->cTransform->velocity.y;
+        }
     }
-    else if (m_player->cInput->down && !m_player->cInput->right && !m_player->cInput->left)
-    {
-        m_player->cTransform->velocity = {0.0, m_playerConfig.S};
-
-        m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
-    }
-    else if (m_player->cInput->down && m_player->cInput->right && !m_player->cInput->left)
-    {
-        m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
-
-        m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
-        m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
-    }
-    else if (m_player->cInput->down && !m_player->cInput->right && m_player->cInput->left)
-    {
-        m_player->cTransform->velocity = {m_playerConfig.S * (float) std::cos(M_PI_4), m_playerConfig.S * (float) std::sin(M_PI_4)};
-
-        m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
-        m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
-    }
-    else if (!m_player->cInput->up && m_player->cInput->right && !m_player->cInput->left)
+    else if ((m_player->cInput->right || m_player->cInput->left) && !(m_player->cInput->right && m_player->cInput->left))
     {
         m_player->cTransform->velocity = {m_playerConfig.S, 0.0f};
 
-        m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
-    }
-    else if (!m_player->cInput->up && !m_player->cInput->right && m_player->cInput->left)
-    {
-        m_player->cTransform->velocity = {m_playerConfig.S, 0.0f};
-
-        m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
+        m_player->cInput->right ? m_player->cTransform->pos.x += m_player->cTransform->velocity.x : m_player->cTransform->pos.x -= m_player->cTransform->velocity.x;
     }
 }
 
