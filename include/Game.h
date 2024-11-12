@@ -83,7 +83,7 @@ class Game
     void init(const std::string &config);
     void setPaused(bool paused);
 
-    bool canMove(char dir);
+    bool canMove(const char dir);
 
     void sMovement();
     void sUserInput();

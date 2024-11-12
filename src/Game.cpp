@@ -214,7 +214,7 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 {
 }
 
-bool Game::canMove(char dir)
+bool Game::canMove(const char dir)
 {
     switch (dir) 
     {
