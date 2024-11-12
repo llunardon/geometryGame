@@ -107,13 +107,12 @@ void Game::run()
             sMovement();
             sCollision();
             sLifespan();
+
             m_currentFrame++;
         }
 
         sUserInput();
         sRender();
-
-        std::cout << "game is running" << std::endl;
     }
 }
 
@@ -268,7 +267,11 @@ void Game::sLifespan()
             if (e->cLifespan->remaining > 0)
             {
                 e->cLifespan->remaining--;
-                // implement alpha channel
+                
+                sf::Color color = e->cShape->circle.getFillColor();
+                color.a = 255 * e->cLifespan->remaining / e->cLifespan->total;
+
+                e->cShape->circle.setFillColor(color);
             }
             else
             {
