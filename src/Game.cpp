@@ -103,6 +103,7 @@ void Game::run()
         {
             m_entities.update();
 
+            sUserInput();
             sEnemySpawner();
             sMovement();
             sCollision();
@@ -111,7 +112,6 @@ void Game::run()
             m_currentFrame++;
         }
 
-        sUserInput();
         sRender();
     }
 }
@@ -144,19 +144,19 @@ void Game::spawnPlayer()
 
 void Game::spawnEnemy()
 {
-    float radius = m_enemyConfig.SR;
-    float collRadius = m_enemyConfig.CR;
 
     auto entity = m_entities.addEntity("enemy");
 
-    float ex = collRadius + (std::rand() % (m_window.getSize().x - (int)std::ceil(2 * collRadius)));
-    float ey = collRadius + (std::rand() % (m_window.getSize().y - (int)std::ceil(2 * collRadius)));
+    float collRadius = m_enemyConfig.CR;
+
+    Vec2 origin = {
+        collRadius + (std::rand() % (m_window.getSize().x - (int)std::ceil(2 * collRadius))),
+        collRadius + (std::rand() % (m_window.getSize().y - (int)std::ceil(2 * collRadius)))};
 
     float speed = m_enemyConfig.SMIN + (std::rand() % (int)(m_enemyConfig.SMAX - m_enemyConfig.SMIN + 1));
     float angle = std::rand() % 360;
 
-    float sx = std::cos(angle) * speed;
-    float sy = std::sin(angle) * speed;
+    Vec2 velocity = {std::cos(angle) * speed, std::sin(angle) * speed};
 
     int sides = m_enemyConfig.VMIN + (std::rand() % (m_enemyConfig.VMAX - m_enemyConfig.VMIN + 1));
 
@@ -164,9 +164,13 @@ void Game::spawnEnemy()
     int g = (std::rand() % 255);
     int b = (std::rand() % 255);
 
-    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(sx, sy), 0.0f);
+    entity->cTransform = std::make_shared<CTransform>(origin, velocity, 0.0f);
 
-    entity->cShape = std::make_shared<CShape>(radius, sides, sf::Color(r, g, b), sf::Color(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB), m_enemyConfig.OT);
+    entity->cShape = std::make_shared<CShape>(m_enemyConfig.SR,
+                                              sides,
+                                              sf::Color(r, g, b),
+                                              sf::Color(m_enemyConfig.OR, m_enemyConfig.OG, m_enemyConfig.OB),
+                                              m_enemyConfig.OT);
 
     entity->cCollision = std::make_shared<CCollision>(collRadius);
 
@@ -180,8 +184,7 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
     float radius = m_enemyConfig.SR / 3;
     float collRadius = m_enemyConfig.CR / 3;
 
-    float ex = e->cTransform->pos.x;
-    float ey = e->cTransform->pos.y;
+    Vec2 origin = {e->cTransform->pos.x, e->cTransform->pos.y};
 
     float angle = e->cTransform->angle;
     float speed = m_playerConfig.S;
@@ -196,10 +199,9 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
     {
         auto entity = m_entities.addEntity("small");
 
-        float sx = speed * (float)std::cos((360.0f / sides) * i * (M_PI / 180.0f));
-        float sy = speed * (float)std::sin((360.0f / sides) * i * (M_PI / 180.0f));
+        Vec2 velocity = {speed * (float)std::cos((360.0f / sides) * i * (M_PI / 180.0f) + angle), speed * (float)std::sin((360.0f / sides) * i * (M_PI / 180.0f) + angle)};
 
-        entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(sx, sy), angle);
+        entity->cTransform = std::make_shared<CTransform>(origin, velocity, angle);
 
         entity->cCollision = std::make_shared<CCollision>(collRadius);
 
@@ -266,17 +268,20 @@ bool Game::canMove(const char dir)
     }
 }
 
-void Game::moveCoords(std::shared_ptr<Entity> e)
-{
-    e->cTransform->pos.x += e->cTransform->velocity.x;
-    e->cTransform->pos.y += e->cTransform->velocity.y;
-}
-
 void Game::sMovement()
 {
-    for (auto e : m_entities.getEntities("enemy")) { moveCoords(e); };
-    for (auto e : m_entities.getEntities("bullet")) { moveCoords(e); };
-    for (auto e : m_entities.getEntities("small")) { moveCoords(e); };
+    for (auto e : m_entities.getEntities("enemy"))
+    {
+        e->cTransform->pos += e->cTransform->velocity;
+    };
+    for (auto e : m_entities.getEntities("bullet"))
+    {
+        e->cTransform->pos += e->cTransform->velocity;
+    };
+    for (auto e : m_entities.getEntities("small"))
+    {
+        e->cTransform->pos += e->cTransform->velocity;
+    };
 
     if ((m_player->cInput->up || m_player->cInput->down) && !(m_player->cInput->up && m_player->cInput->down))
     {
@@ -370,7 +375,7 @@ void Game::sCollision()
         /* enemy-bullet collision */
         for (auto bullet : m_entities.getEntities("bullet"))
         {
-            if (std::sqrt(std::pow(e->cTransform->pos.x - bullet->cTransform->pos.x, 2) + std::pow(e->cTransform->pos.y - bullet->cTransform->pos.y, 2)) < std::abs(e->cCollision->radius + bullet->cCollision->radius))
+            if (e->cTransform->pos.dist(bullet->cTransform->pos) < std::abs(e->cCollision->radius + bullet->cCollision->radius))
             {
                 spawnSmallEnemies(e);
                 e->destroy();
@@ -378,10 +383,9 @@ void Game::sCollision()
         }
 
         /* enemy-player collision */
-        if (std::sqrt(std::pow(e->cTransform->pos.x - m_player->cTransform->pos.x, 2) + std::pow(e->cTransform->pos.y - m_player->cTransform->pos.y, 2)) < std::abs(e->cCollision->radius + m_player->cCollision->radius))
+        if (e->cTransform->pos.dist(m_player->cTransform->pos) < std::abs(e->cCollision->radius + m_player->cCollision->radius))
         {
-            m_player->cTransform->pos.x = m_window.getSize().x / 2.0f;
-            m_player->cTransform->pos.y = m_window.getSize().y / 2.0f;
+            m_player->cTransform->pos = {m_window.getSize().x / 2.0f, m_window.getSize().y / 2.0f};
         }
 
         /* enemy-wall collision */
@@ -398,12 +402,10 @@ void Game::sCollision()
     for (auto e : m_entities.getEntities("small"))
     {
         /* enemy-player collision */
-        if (std::sqrt(std::pow(e->cTransform->pos.x - m_player->cTransform->pos.x, 2) + std::pow(e->cTransform->pos.y - m_player->cTransform->pos.y, 2)) < std::abs(e->cCollision->radius + m_player->cCollision->radius))
+        if (e->cTransform->pos.dist(m_player->cTransform->pos) < std::abs(e->cCollision->radius + m_player->cCollision->radius))
         {
-            m_player->cTransform->pos.x = m_window.getSize().x / 2.0f;
-            m_player->cTransform->pos.y = m_window.getSize().y / 2.0f;
+            m_player->cTransform->pos = {m_window.getSize().x / 2.0f, m_window.getSize().y / 2.0f};
         }
-
     }
 }
 

@@ -84,7 +84,6 @@ class Game
     void setPaused(bool paused);
 
     bool canMove(const char dir);
-    void moveCoords(std::shared_ptr<Entity> e);
 
     void sMovement();
     void sUserInput();
