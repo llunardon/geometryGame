@@ -99,11 +99,12 @@ void Game::run()
 {
     while (m_running)
     {
+        sUserInput();
+
         if (!m_paused)
         {
             m_entities.update();
 
-            sUserInput();
             sEnemySpawner();
             sMovement();
             sCollision();
@@ -452,24 +453,20 @@ void Game::sUserInput()
             case sf::Keyboard::P:
                 setPaused(m_paused);
                 break;
-
-                if (!m_paused)
-                {
-                case sf::Keyboard::W:
-                    m_player->cInput->up = true;
-                    break;
-                case sf::Keyboard::S:
-                    m_player->cInput->down = true;
-                    break;
-                case sf::Keyboard::A:
-                    m_player->cInput->left = true;
-                    break;
-                case sf::Keyboard::D:
-                    m_player->cInput->right = true;
-                    break;
-                default:
-                    break;
-                }
+            case sf::Keyboard::W:
+                m_player->cInput->up = true;
+                break;
+            case sf::Keyboard::S:
+                m_player->cInput->down = true;
+                break;
+            case sf::Keyboard::A:
+                m_player->cInput->left = true;
+                break;
+            case sf::Keyboard::D:
+                m_player->cInput->right = true;
+                break;
+            default:
+                break;
             }
         }
 
