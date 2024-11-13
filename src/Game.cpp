@@ -150,9 +150,7 @@ void Game::spawnEnemy()
 
     float collRadius = m_enemyConfig.CR;
 
-    Vec2 origin = {
-        collRadius + (std::rand() % (m_window.getSize().x - (int)std::ceil(2 * collRadius))),
-        collRadius + (std::rand() % (m_window.getSize().y - (int)std::ceil(2 * collRadius)))};
+    Vec2 origin = {collRadius + (std::rand() % (m_window.getSize().x - (int)std::ceil(2 * collRadius))), collRadius + (std::rand() % (m_window.getSize().y - (int)std::ceil(2 * collRadius)))};
 
     float speed = m_enemyConfig.SMIN + (std::rand() % (int)(m_enemyConfig.SMAX - m_enemyConfig.SMIN + 1));
     float angle = std::rand() % 360;
