@@ -72,6 +72,7 @@ class Game
     PlayerConfig m_playerConfig;
     EnemyConfig m_enemyConfig;
     BulletConfig m_bulletConfig;
+    int m_frameRate = 60;
     int m_score = 0;
     int m_currentFrame = 0;
     int m_lastEnemySpawnTime = 0;

@@ -1,6 +1,8 @@
 #include <Game.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <set>
 
 #define _USE_MATH_DEFINES
@@ -28,9 +30,9 @@ void Game::init(const std::string &path)
         std::cout << "Error loading font" << std::endl;
     }
     m_text.setFont(m_font);
-    m_text.setString("Hello world");
-    m_text.setCharacterSize(16);
+    m_text.setCharacterSize(20);
     m_text.setFillColor(sf::Color::White);
+    m_text.setPosition(10.0f, 10.0f);
 
     std::string line;
     while (std::getline(config_file, line))
@@ -51,6 +53,7 @@ void Game::init(const std::string &path)
                 m_window.create(sf::VideoMode(std::stoi(tokens[1]), std::stoi(tokens[2])), "GeometryGame", sf::Style::Default);
             }
 
+            m_frameRate = std::stoi(tokens[3]);
             m_window.setFramerateLimit(std::stoi(tokens[3]));
         }
         else if (tokens[0] == "PLAYER")
@@ -439,6 +442,13 @@ void Game::sRender()
 
         m_window.draw(e->cShape->circle);
     }
+
+    float roundedTime = (float) m_currentFrame / m_frameRate;
+
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(2) << roundedTime;
+    std::string roundedTimeStr = out.str();
+    m_text.setString(roundedTimeStr);
 
     m_window.draw(m_text);
 
