@@ -23,6 +23,15 @@ void Game::init(const std::string &path)
         std::cerr << "Error opening config file " << path << std::endl;
     }
 
+    if (!m_font.loadFromFile("../opensans.ttf"))
+    {
+        std::cout << "Error loading font" << std::endl;
+    }
+    m_text.setFont(m_font);
+    m_text.setString("Hello world");
+    m_text.setCharacterSize(16);
+    m_text.setFillColor(sf::Color::White);
+
     std::string line;
     while (std::getline(config_file, line))
     {
@@ -173,8 +182,6 @@ void Game::spawnEnemy()
                                               m_enemyConfig.OT);
 
     entity->cCollision = std::make_shared<CCollision>(collRadius);
-
-    entity->cLifespan = std::make_shared<CLifespan>(240);
 
     m_lastEnemySpawnTime = m_currentFrame;
 }
@@ -432,6 +439,8 @@ void Game::sRender()
 
         m_window.draw(e->cShape->circle);
     }
+
+    m_window.draw(m_text);
 
     m_window.display();
 }
