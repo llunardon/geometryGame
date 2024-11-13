@@ -125,9 +125,10 @@ void Game::spawnPlayer()
 {
     auto entity = m_entities.addEntity("player");
 
-    float mx = m_window.getSize().x / 2.0f;
-    float my = m_window.getSize().y / 2.0f;
-    entity->cTransform = std::make_shared<CTransform>(Vec2(mx, my), Vec2(0.0f, 0.0f), 0.0f);
+    Vec2 center = {m_window.getSize().x / 2.0f, m_window.getSize().y / 2.0f};
+    Vec2 velocity = {0.0f, 0.0f};
+
+    entity->cTransform = std::make_shared<CTransform>(center, velocity, 0.0f);
 
     entity->cShape = std::make_shared<CShape>(m_playerConfig.SR,
                                               m_playerConfig.V,
@@ -274,10 +275,12 @@ void Game::sMovement()
     {
         e->cTransform->pos += e->cTransform->velocity;
     };
+
     for (auto e : m_entities.getEntities("bullet"))
     {
         e->cTransform->pos += e->cTransform->velocity;
     };
+
     for (auto e : m_entities.getEntities("small"))
     {
         e->cTransform->pos += e->cTransform->velocity;
