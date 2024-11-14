@@ -504,7 +504,7 @@ void Game::drawLoadingBar()
     m_window.draw(outerRect);
 
     int totalInner = 8;
-    int indexInner = std::min(((m_currentFrame - m_lastSpecialWeaponUse) * totalInner) / (m_frameRate * 4), totalInner);
+    int indexInner = std::min(((m_currentFrame - m_lastSpecialWeaponUse) * totalInner) / (m_specialWeaponCooldown), totalInner);
     for (int i = 0; i < indexInner; i++)
     {
         sf::RectangleShape innerRect = sf::RectangleShape(sf::Vector2f(width / totalInner, height));
@@ -579,7 +579,7 @@ void Game::sUserInput()
                     spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
                 }
 
-                if (event.mouseButton.button == sf::Mouse::Right && (m_currentFrame - m_lastSpecialWeaponUse > m_frameRate * 4))
+                if (event.mouseButton.button == sf::Mouse::Right && (m_currentFrame - m_lastSpecialWeaponUse > m_specialWeaponCooldown))
                 {
                     spawnSpecialWeapon(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
                     m_lastSpecialWeaponUse = m_currentFrame;

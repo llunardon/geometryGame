@@ -77,6 +77,7 @@ class Game
     int m_currentFrame = 0;
     int m_lastEnemySpawnTime = 0;
     int m_lastSpecialWeaponUse = 0;
+    int m_specialWeaponCooldown = m_frameRate * 4;
     bool m_paused = false;
     bool m_running = true;
 
