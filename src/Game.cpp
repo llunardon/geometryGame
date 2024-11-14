@@ -558,9 +558,10 @@ void Game::sUserInput()
                     spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
                 }
 
-                if (event.mouseButton.button == sf::Mouse::Right)
+                if (event.mouseButton.button == sf::Mouse::Right && (m_currentFrame - m_lastSpecialWeaponUse  > m_frameRate * 5))
                 {
                     spawnSpecialWeapon(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
+                    m_lastSpecialWeaponUse = m_currentFrame;
                 }
             }
         }
