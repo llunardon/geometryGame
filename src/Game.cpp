@@ -234,18 +234,16 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 &target)
     float speed = m_bulletConfig.S;
     float angle = std::atan2((target.y - originY), (target.x - originX));
 
-    float sx = std::cos(angle) * speed;
-    float sy = std::sin(angle) * speed;
+    Vec2 velocity = {std::cos(angle) * speed, std::sin(angle) * speed};
 
     int sides = m_bulletConfig.V;
 
-    int r = m_bulletConfig.FR;
-    int g = m_bulletConfig.FG;
-    int b = m_bulletConfig.FB;
+    sf::Color fillColor = sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB);
+    sf::Color outlineColor = sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB);
 
-    bulletEntity->cTransform = std::make_shared<CTransform>(Vec2(originX, originY), Vec2(sx, sy), 0.0f);
+    bulletEntity->cTransform = std::make_shared<CTransform>(Vec2(originX, originY), velocity, 0.0f);
 
-    bulletEntity->cShape = std::make_shared<CShape>(radius, sides, sf::Color(r, g, b), sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB), m_bulletConfig.OT);
+    bulletEntity->cShape = std::make_shared<CShape>(radius, sides, fillColor, outlineColor, m_bulletConfig.OT);
 
     bulletEntity->cCollision = std::make_shared<CCollision>(collRadius);
 
@@ -264,13 +262,12 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity, const Vec2 &target
     float speed = m_bulletConfig.S;
     float angle = std::atan2((target.y - originY), (target.x - originX));
 
-    float sx = std::cos(angle) * speed;
-    float sy = std::sin(angle) * speed;
+    Vec2 velocity = {std::cos(angle) * speed, std::sin(angle) * speed};
 
     sf::Color fillColor = sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB);
     sf::Color outlineColor = sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB);
 
-    bulletEntity->cTransform = std::make_shared<CTransform>(Vec2(originX, originY), Vec2(sx, sy), 0.0f);
+    bulletEntity->cTransform = std::make_shared<CTransform>(Vec2(originX, originY), velocity, 0.0f);
 
     bulletEntity->cShape = std::make_shared<CShape>(m_bulletConfig.SR, 
                                                     m_playerConfig.V,
