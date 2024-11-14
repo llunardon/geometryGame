@@ -252,8 +252,35 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 &target)
     bulletEntity->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
 }
 
-void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
+void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity, const Vec2 &target)
 {
+    float collRadius = m_bulletConfig.CR;
+
+    auto bulletEntity = m_entities.addEntity("special");
+
+    float originX = entity->cTransform->pos.x;
+    float originY = entity->cTransform->pos.y;
+
+    float speed = m_bulletConfig.S;
+    float angle = std::atan2((target.y - originY), (target.x - originX));
+
+    float sx = std::cos(angle) * speed;
+    float sy = std::sin(angle) * speed;
+
+    sf::Color fillColor = sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB);
+    sf::Color outlineColor = sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB);
+
+    bulletEntity->cTransform = std::make_shared<CTransform>(Vec2(originX, originY), Vec2(sx, sy), 0.0f);
+
+    bulletEntity->cShape = std::make_shared<CShape>(m_bulletConfig.SR, 
+                                                    m_playerConfig.V,
+                                                    fillColor,
+                                                    outlineColor,
+                                                    m_playerConfig.OT / 2);
+
+    bulletEntity->cCollision = std::make_shared<CCollision>(collRadius);
+
+    bulletEntity->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
 }
 
 bool Game::canMove(const char dir)
@@ -286,6 +313,11 @@ void Game::sMovement()
     };
 
     for (auto e : m_entities.getEntities("bullet"))
+    {
+        e->cTransform->pos += e->cTransform->velocity;
+    };
+
+    for (auto e : m_entities.getEntities("special"))
     {
         e->cTransform->pos += e->cTransform->velocity;
     };
@@ -391,6 +423,16 @@ void Game::sCollision()
             {
                 spawnSmallEnemies(e);
                 e->destroy();
+            }
+        }
+
+        /* enemy-special weapon collision */
+        for (auto specialBullet : m_entities.getEntities("special"))
+        {
+            if (e->cTransform->pos.dist(specialBullet->cTransform->pos) < std::abs(e->cCollision->radius + specialBullet->cCollision->radius))
+            {
+                e->destroy();
+                specialBullet->destroy();
             }
         }
 
@@ -521,7 +563,7 @@ void Game::sUserInput()
 
                 if (event.mouseButton.button == sf::Mouse::Right)
                 {
-                    /* TODO: call spawnSpecialWeapon here */
+                    spawnSpecialWeapon(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
                 }
             }
         }
