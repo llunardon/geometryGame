@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.30)
-project(sfml_setup)
+project(geometryGame)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 set(BUILD_SHARED_LIBS FALSE)
