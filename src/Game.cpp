@@ -257,20 +257,17 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity, const Vec2 &target
 
     Vec2 velocity = {std::cos(angle) * m_bulletConfig.S, std::sin(angle) * m_bulletConfig.S};
 
-    sf::Color fillColor = sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB);
-    sf::Color outlineColor = sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB);
-
     bulletEntity->cTransform = std::make_shared<CTransform>(Vec2(originX, originY), velocity, 0.0f);
 
-    bulletEntity->cShape = std::make_shared<CShape>(m_bulletConfig.SR, 
+    bulletEntity->cShape = std::make_shared<CShape>(m_bulletConfig.SR,
                                                     m_playerConfig.V,
-                                                    fillColor,
-                                                    outlineColor,
+                                                    sf::Color(220, 220, 100),
+                                                    sf::Color(170, 255, 45),
                                                     m_playerConfig.OT / 2);
 
     bulletEntity->cCollision = std::make_shared<CCollision>(m_bulletConfig.CR);
 
-    bulletEntity->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
+    bulletEntity->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L / 2);
 }
 
 bool Game::canMove(const char dir)
@@ -413,6 +410,7 @@ void Game::sCollision()
             {
                 spawnSmallEnemies(e);
                 e->destroy();
+                bullet->destroy();
             }
         }
 
@@ -482,7 +480,7 @@ void Game::sRender()
         m_window.draw(e->cShape->circle);
     }
 
-    float roundedTime = (float) m_currentFrame / m_frameRate;
+    float roundedTime = (float)m_currentFrame / m_frameRate;
 
     std::ostringstream out;
     out << std::fixed << std::setprecision(2) << roundedTime;
@@ -491,7 +489,33 @@ void Game::sRender()
 
     m_window.draw(m_text);
 
+    drawLoadingBar();
+
     m_window.display();
+}
+
+void Game::drawLoadingBar()
+{
+    float width = 96.0f;
+    float height = 16.0f;
+
+    sf::RectangleShape outerRect = sf::RectangleShape(sf::Vector2f(width, height));
+    outerRect.setPosition(m_window.getSize().x - (1.5f * width), height);
+    m_window.draw(outerRect);
+
+    int totalInner = 8;
+    int indexInner = std::min(((m_currentFrame - m_lastSpecialWeaponUse) * totalInner) / (m_frameRate * 4), totalInner);
+    for (int i = 0; i < indexInner; i++)
+    {
+        sf::RectangleShape innerRect = sf::RectangleShape(sf::Vector2f(width / totalInner, height));
+
+        innerRect.setPosition(m_window.getSize().x - (1.5f * width) + (i * width / totalInner), height);
+
+        innerRect.setFillColor(sf::Color(255, 0, 0));
+
+        m_window.draw(innerRect);
+    }
+
 }
 
 void Game::sUserInput()
@@ -558,7 +582,7 @@ void Game::sUserInput()
                     spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
                 }
 
-                if (event.mouseButton.button == sf::Mouse::Right && (m_currentFrame - m_lastSpecialWeaponUse  > m_frameRate * 5))
+                if (event.mouseButton.button == sf::Mouse::Right && (m_currentFrame - m_lastSpecialWeaponUse > m_frameRate * 4))
                 {
                     spawnSpecialWeapon(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
                     m_lastSpecialWeaponUse = m_currentFrame;
