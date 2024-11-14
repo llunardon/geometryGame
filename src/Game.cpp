@@ -54,6 +54,7 @@ void Game::init(const std::string &path)
             }
 
             m_frameRate = std::stoi(tokens[3]);
+            m_specialWeaponCooldown = m_frameRate * 4;
             m_window.setFramerateLimit(std::stoi(tokens[3]));
         }
         else if (tokens[0] == "PLAYER")
