@@ -201,8 +201,8 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 
     int sides = e->cShape->circle.getPointCount();
 
-    sf::Color color = e->cShape->circle.getFillColor();
-    sf::Color outline = e->cShape->circle.getOutlineColor();
+    sf::Color fillColor = e->cShape->circle.getFillColor();
+    sf::Color outlineColor = e->cShape->circle.getOutlineColor();
     float outlineThickness = e->cShape->circle.getOutlineThickness() / 2;
 
     for (int i = 0; i < sides; i++)
@@ -217,52 +217,45 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> e)
 
         entity->cLifespan = std::make_shared<CLifespan>(m_enemyConfig.L);
 
-        entity->cShape = std::make_shared<CShape>(radius, sides, color, outline, outlineThickness);
+        entity->cShape = std::make_shared<CShape>(radius, sides, fillColor, outlineColor, outlineThickness);
     }
 }
 
 void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 &target)
 {
-    float radius = m_bulletConfig.SR;
-    float collRadius = m_bulletConfig.CR;
-
     auto bulletEntity = m_entities.addEntity("bullet");
 
     float originX = entity->cTransform->pos.x;
     float originY = entity->cTransform->pos.y;
-
-    float speed = m_bulletConfig.S;
     float angle = std::atan2((target.y - originY), (target.x - originX));
 
-    Vec2 velocity = {std::cos(angle) * speed, std::sin(angle) * speed};
-
-    int sides = m_bulletConfig.V;
+    Vec2 velocity = {std::cos(angle) * m_bulletConfig.S, std::sin(angle) * m_bulletConfig.S};
 
     sf::Color fillColor = sf::Color(m_bulletConfig.FR, m_bulletConfig.FG, m_bulletConfig.FB);
     sf::Color outlineColor = sf::Color(m_bulletConfig.OR, m_bulletConfig.OG, m_bulletConfig.OB);
 
     bulletEntity->cTransform = std::make_shared<CTransform>(Vec2(originX, originY), velocity, 0.0f);
 
-    bulletEntity->cShape = std::make_shared<CShape>(radius, sides, fillColor, outlineColor, m_bulletConfig.OT);
+    bulletEntity->cShape = std::make_shared<CShape>(m_bulletConfig.SR,
+                                                    m_bulletConfig.V,
+                                                    fillColor,
+                                                    outlineColor,
+                                                    m_bulletConfig.OT);
 
-    bulletEntity->cCollision = std::make_shared<CCollision>(collRadius);
+    bulletEntity->cCollision = std::make_shared<CCollision>(m_bulletConfig.CR);
 
     bulletEntity->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity, const Vec2 &target)
 {
-    float collRadius = m_bulletConfig.CR;
-
     auto bulletEntity = m_entities.addEntity("special");
 
     float originX = entity->cTransform->pos.x;
     float originY = entity->cTransform->pos.y;
-
-    float speed = m_bulletConfig.S;
     float angle = std::atan2((target.y - originY), (target.x - originX));
 
-    Vec2 velocity = {std::cos(angle) * speed, std::sin(angle) * speed};
+    Vec2 velocity = {std::cos(angle) * m_bulletConfig.S, std::sin(angle) * m_bulletConfig.S};
 
     sf::Color fillColor = sf::Color(m_playerConfig.FR, m_playerConfig.FG, m_playerConfig.FB);
     sf::Color outlineColor = sf::Color(m_playerConfig.OR, m_playerConfig.OG, m_playerConfig.OB);
@@ -275,7 +268,7 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity, const Vec2 &target
                                                     outlineColor,
                                                     m_playerConfig.OT / 2);
 
-    bulletEntity->cCollision = std::make_shared<CCollision>(collRadius);
+    bulletEntity->cCollision = std::make_shared<CCollision>(m_bulletConfig.CR);
 
     bulletEntity->cLifespan = std::make_shared<CLifespan>(m_bulletConfig.L);
 }
