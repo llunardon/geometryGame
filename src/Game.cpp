@@ -508,14 +508,11 @@ void Game::drawLoadingBar()
     for (int i = 0; i < indexInner; i++)
     {
         sf::RectangleShape innerRect = sf::RectangleShape(sf::Vector2f(width / totalInner, height));
-
         innerRect.setPosition(m_window.getSize().x - (1.5f * width) + (i * width / totalInner), height);
-
         innerRect.setFillColor(sf::Color(255, 0, 0));
 
         m_window.draw(innerRect);
     }
-
 }
 
 void Game::sUserInput()
