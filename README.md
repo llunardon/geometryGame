@@ -1,5 +1,7 @@
 # Geometry Game
 
+![screenshot](screenshot.png)
+
 ### NOTES:
 - Developed using CMake version 3.30 on Windows 10
 - The game uses SFML version 2.6.1

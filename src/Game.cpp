@@ -530,6 +530,9 @@ void Game::sUserInput()
         {
             switch (event.key.code)
             {
+            case sf::Keyboard::Q:
+                m_running = false;
+                break;
             case sf::Keyboard::P:
                 setPaused(m_paused);
                 break;
