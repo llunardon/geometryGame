@@ -10,7 +10,7 @@
 
 ### Build
 ```
-`mkdir external`
+mkdir external
 
 git clone --branch 2.6.1 https://github.com/SFML/SFML.git external
 
