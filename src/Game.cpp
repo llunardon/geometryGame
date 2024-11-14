@@ -423,6 +423,13 @@ void Game::sCollision()
             {
                 e->destroy();
                 specialBullet->destroy();
+
+                for (int i = 0; i < 8; i++)
+                {
+                    Vec2 velocity = {m_playerConfig.S * (float)std::cos((360.0f / 8) * i * (M_PI / 180.0f)), m_playerConfig.S * (float)std::sin((360.0f / 8) * i * (M_PI / 180.0f))};
+                    Vec2 target = {e->cTransform->pos.x + velocity.x, e->cTransform->pos.y + velocity.y};
+                    spawnSpecialWeapon(e, target);
+                }
             }
         }
 
