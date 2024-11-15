@@ -1,7 +1,6 @@
 #include <Game.h>
 #include <iostream>
 #include <fstream>
-#include <iomanip>
 #include <set>
 
 #define _USE_MATH_DEFINES
@@ -387,9 +386,12 @@ void Game::sLifespan()
                 e->cLifespan->remaining--;
 
                 sf::Color color = e->cShape->circle.getFillColor();
+                sf::Color outlineColor = e->cShape->circle.getOutlineColor();
                 color.a = 255 * e->cLifespan->remaining / e->cLifespan->total;
+                outlineColor.a = color.a;
 
                 e->cShape->circle.setFillColor(color);
+                e->cShape->circle.setOutlineColor(outlineColor);
             }
             else
             {
@@ -411,6 +413,8 @@ void Game::sCollision()
                 spawnSmallEnemies(e);
                 e->destroy();
                 bullet->destroy();
+
+                m_score += 50;
             }
         }
 
@@ -421,6 +425,8 @@ void Game::sCollision()
             {
                 e->destroy();
                 specialBullet->destroy();
+
+                m_score += 25;
 
                 for (int i = 0; i < 8; i++)
                 {
@@ -435,6 +441,8 @@ void Game::sCollision()
         if (e->cTransform->pos.dist(m_player->cTransform->pos) < std::abs(e->cCollision->radius + m_player->cCollision->radius))
         {
             m_player->cTransform->pos = {m_window.getSize().x / 2.0f, m_window.getSize().y / 2.0f};
+            m_score -= 100;
+            m_score = std::max(0, m_score);
         }
 
         /* enemy-wall collision */
@@ -480,13 +488,7 @@ void Game::sRender()
         m_window.draw(e->cShape->circle);
     }
 
-    float roundedTime = (float)m_currentFrame / m_frameRate;
-
-    std::ostringstream out;
-    out << std::fixed << std::setprecision(2) << roundedTime;
-    std::string roundedTimeStr = out.str();
-    m_text.setString(roundedTimeStr);
-
+    m_text.setString(std::to_string(m_score));
     m_window.draw(m_text);
 
     drawLoadingBar();
