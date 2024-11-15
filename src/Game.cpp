@@ -505,7 +505,7 @@ void Game::sRender()
 
     if (m_lives > 0)
     {
-        m_text.setString(std::to_string(m_score));
+        m_text.setString("Lives: " + std::to_string(m_lives) + " - Score: " + std::to_string(m_score));
         m_window.draw(m_text);
 
         drawLoadingBar();
