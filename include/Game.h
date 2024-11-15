@@ -43,6 +43,8 @@
             - OT: outline thickness (int)
             - V: number of vertices of the shape (int)
             - L: lifespan (int)
+        - LIVES: L
+            - L: number of lives before game stops
 */
 
 struct PlayerConfig
@@ -74,6 +76,7 @@ class Game
     BulletConfig m_bulletConfig;
     int m_frameRate = 60;
     int m_score = 0;
+    int m_lives = 5;
     int m_currentFrame = 0;
     int m_lastEnemySpawnTime = 0;
     int m_lastSpecialWeaponUse = 0;

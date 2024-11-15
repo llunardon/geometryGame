@@ -99,6 +99,10 @@ void Game::init(const std::string &path)
             m_bulletConfig.V = std::stoi(tokens[11]);
             m_bulletConfig.L = std::stoi(tokens[12]);
         }
+        else if (tokens[0] == "BULLET")
+        {
+            m_lives = std::stoi(tokens[1]);
+        }
     }
 
     config_file.close();
@@ -108,23 +112,33 @@ void Game::init(const std::string &path)
 
 void Game::run()
 {
+    int deathFrames = 0;
+
     while (m_running)
     {
-        sUserInput();
-
-        if (!m_paused)
+        if (m_lives > 0)
         {
-            m_entities.update();
+            sUserInput();
 
-            sEnemySpawner();
-            sMovement();
-            sCollision();
-            sLifespan();
+            if (!m_paused)
+            {
+                m_entities.update();
 
-            m_currentFrame++;
+                sEnemySpawner();
+                sMovement();
+                sCollision();
+                sLifespan();
+
+                m_currentFrame++;
+            }
+
+            sRender();
         }
-
-        sRender();
+        else
+        {
+            sRender();
+            deathFrames > m_frameRate * 5 ? m_running = false : deathFrames++;
+        }
     }
 }
 
@@ -443,6 +457,7 @@ void Game::sCollision()
             m_player->cTransform->pos = {m_window.getSize().x / 2.0f, m_window.getSize().y / 2.0f};
             m_score -= 100;
             m_score = std::max(0, m_score);
+            m_lives--;
         }
 
         /* enemy-wall collision */
@@ -488,10 +503,18 @@ void Game::sRender()
         m_window.draw(e->cShape->circle);
     }
 
-    m_text.setString(std::to_string(m_score));
-    m_window.draw(m_text);
+    if (m_lives > 0)
+    {
+        m_text.setString(std::to_string(m_score));
+        m_window.draw(m_text);
 
-    drawLoadingBar();
+        drawLoadingBar();
+    }
+    else
+    {
+        m_text.setString("You lost! Final score: " + std::to_string(m_score));
+        m_window.draw(m_text);
+    }
 
     m_window.display();
 }
